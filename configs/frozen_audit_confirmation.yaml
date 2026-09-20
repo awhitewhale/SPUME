@@ -1,0 +1,17 @@
+seed: 20260912
+upstream_root: /path/to/Wat3R
+checkpoint: /path/to/Wat3R/wat3r.pt
+flsea_root: /path/to/FLSea
+output_dir: outputs/frozen_audit_confirmation
+exclude_manifest: outputs/frozen_audit_synthetic/window_manifest.json
+sequences: [flatiron, horse_canyon, tiny_canyon, u_canyon]
+frames_per_window: 8
+windows_per_sequence: 12
+conditions: [particles, caustics, occlusion]
+layers: [4, 11, 17]
+max_correspondence_views: 4
+intervention:
+  enabled: false
+  layer: 11
+  strength: 0.25
+  methods: [feature_innovation, random, confidence, flow]

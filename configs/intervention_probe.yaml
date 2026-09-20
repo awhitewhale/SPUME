@@ -1,0 +1,17 @@
+seed: 20260912
+upstream_root: /path/to/Wat3R
+checkpoint: /path/to/Wat3R/wat3r.pt
+flsea_root: /path/to/FLSea
+output_dir: outputs/intervention_probe_residual_l11_a010
+sequences: [flatiron, horse_canyon, tiny_canyon, u_canyon]
+frames_per_window: 8
+windows_per_sequence: 2
+conditions: [particles, caustics, occlusion]
+layers: [4, 11, 17]
+max_correspondence_views: 4
+intervention:
+  enabled: true
+  mode: residual
+  layer: 11
+  strength: 0.10
+  methods: [feature_innovation, persistence, random]

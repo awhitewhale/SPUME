@@ -1,0 +1,25 @@
+seed: 20260912
+upstream_root: /path/to/Wat3R
+checkpoint: /path/to/Wat3R/wat3r.pt
+flsea_root: /path/to/FLSea
+cache_dir: cache/adapter_leakage_v0
+output_dir: outputs/adapter_leakage_v0_valid
+sequences: [flatiron, horse_canyon, tiny_canyon, u_canyon]
+frames_per_window: 4
+windows_per_sequence: 16
+train_windows_per_sequence: 16
+evaluation_split: train
+conditions: [clean, particles, caustics, occlusion]
+layers: [4, 11, 17]
+max_correspondence_views: 3
+epochs: 5
+learning_rate: 0.0005
+weight_decay: 0.0001
+hidden: 16
+max_log_residual: 0.7
+success_gate:
+  corrupt_vs_no_risk: 0.03
+  corrupt_vs_random: 0.03
+  corrupt_vs_wat3r: 0.02
+  clean_max_degradation: 0.01
+  max_coverage_loss: 0.02

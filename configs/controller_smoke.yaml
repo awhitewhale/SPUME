@@ -1,0 +1,16 @@
+seed: 20260912
+upstream_root: /path/to/Wat3R
+checkpoint: /path/to/Wat3R/wat3r.pt
+flsea_root: /path/to/FLSea
+output_dir: outputs/controller_smoke_augmented
+sequences: [flatiron]
+frames_per_window: 4
+windows_per_sequence: 2
+steps: 4
+conditions: [clean, particles, caustics, occlusion]
+layer: 17
+learning_rate: 0.05
+identity_weight: 0.05
+initial_gate: 0.99
+layers: [4, 11, 17]
+max_correspondence_views: 3
