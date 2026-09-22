@@ -4,8 +4,9 @@ This directory contains the static project page published at
 `https://awhitewhale.github.io/SPUME/`.
 
 The page is intentionally build-free: serve `docs/` with any static HTTP
-server. Web-ready figures, Water3D frames, and point-cloud previews can be
-regenerated without modifying their sources:
+server. Web-ready method figures, observation/SPUME reveal panels, and the
+interactive Water3D point clouds can be regenerated without modifying their
+sources:
 
 ```powershell
 python tools/prepare_site_assets.py `

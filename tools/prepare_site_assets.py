@@ -12,35 +12,13 @@ import subprocess
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
+from PIL import Image
 
-
-SCENES = {
-    "reef-lab": ("cv_1426", (1, 100, 200)),
-    "fish-reef": ("cv_575", (1, 58, 115)),
-    "rock-garden": ("cv_587", (1, 54, 108)),
-    "submerged-structure": ("cv_1491", (1, 100, 200)),
-    "green-water-rock": ("cv_1173", (1, 5, 10)),
-    "shallow-rock": ("cv_1136", (1, 8, 16)),
+POINT_CLOUDS = {
+    "reef-lab": "cv_1426",
+    "fish-reef": "cv_575",
+    "green-water-rock": "cv_1173",
 }
-
-
-def fit_webp(source: Path, target: Path, size: tuple[int, int], quality: int = 86) -> None:
-    with Image.open(source) as image:
-        image = image.convert("RGB")
-        src_ratio = image.width / image.height
-        dst_ratio = size[0] / size[1]
-        if src_ratio > dst_ratio:
-            crop_width = round(image.height * dst_ratio)
-            left = (image.width - crop_width) // 2
-            image = image.crop((left, 0, left + crop_width, image.height))
-        else:
-            crop_height = round(image.width / dst_ratio)
-            top = (image.height - crop_height) // 2
-            image = image.crop((0, top, image.width, top + crop_height))
-        image = image.resize(size, Image.Resampling.LANCZOS)
-        target.parent.mkdir(parents=True, exist_ok=True)
-        image.save(target, "WEBP", quality=quality, method=6)
 
 
 def figure_webp(source: Path, target: Path, max_width: int = 2400) -> None:
@@ -53,21 +31,27 @@ def figure_webp(source: Path, target: Path, max_width: int = 2400) -> None:
         image.save(target, "WEBP", quality=92, method=6)
 
 
-def crop_qualitative_panels(source: Path, target_dir: Path) -> None:
-    """Extract only the SPUME reconstruction column from the final-paper figure."""
+def crop_observation_spume_pairs(source: Path, target_dir: Path) -> None:
+    """Create aligned observation/SPUME pairs for the interactive reveal."""
     with Image.open(source) as image:
         image = image.convert("RGB")
         width, height = image.size
-        x0, x1 = round(width * 0.438), round(width * 0.623)
+        columns = {
+            "observation": (0.0635, 0.2470),
+            "spume": (0.4380, 0.6230),
+        }
         rows = {
-            "particles": (0.066, 0.306),
-            "caustics": (0.309, 0.548),
-            "temporary-occlusion": (0.551, 0.790),
+            "particles": (0.0715, 0.3100),
+            "caustics": (0.3235, 0.5605),
+            "temporary-occlusion": (0.5730, 0.8105),
         }
         target_dir.mkdir(parents=True, exist_ok=True)
         for label, (y0, y1) in rows.items():
-            panel = image.crop((x0, round(height * y0), x1, round(height * y1)))
-            panel.save(target_dir / f"{label}.webp", "WEBP", quality=92, method=6)
+            for kind, (x0, x1) in columns.items():
+                panel = image.crop(
+                    (round(width * x0), round(height * y0), round(width * x1), round(height * y1))
+                )
+                panel.save(target_dir / f"{label}-{kind}.webp", "WEBP", quality=94, method=6)
 
 
 def render_pdf_figure(pdftoppm: Path, pdf: Path, target_png: Path, dpi: int = 180) -> None:
@@ -108,8 +92,9 @@ def read_binary_ply(path: Path, max_points: int = 240_000) -> tuple[np.ndarray, 
     return xyz[finite], rgb[finite]
 
 
-def render_point_cloud(source: Path, target: Path, size: tuple[int, int] = (1440, 900)) -> None:
-    xyz, rgb = read_binary_ply(source)
+def export_point_cloud(source: Path, target: Path, max_points: int = 60_000) -> None:
+    """Export a compact, browser-ready float32 point cloud for WebGL."""
+    xyz, rgb = read_binary_ply(source, max_points=max_points * 4)
     center = np.median(xyz, axis=0)
     xyz = xyz - center
     radius = np.linalg.norm(xyz, axis=1)
@@ -118,35 +103,16 @@ def render_point_cloud(source: Path, target: Path, size: tuple[int, int] = (1440
 
     covariance = np.cov(xyz, rowvar=False)
     _, eigenvectors = np.linalg.eigh(covariance)
-    basis = eigenvectors[:, ::-1]
-    aligned = xyz @ basis
-    # Keep the broadest axis horizontal and the thinnest axis as depth.
-    x = aligned[:, 0]
-    y = aligned[:, 1]
-    depth = aligned[:, 2]
-    x_lo, x_hi = np.quantile(x, (0.005, 0.995))
-    y_lo, y_hi = np.quantile(y, (0.005, 0.995))
-    x = np.clip((x - x_lo) / max(x_hi - x_lo, 1e-6), 0, 1)
-    y = np.clip((y - y_lo) / max(y_hi - y_lo, 1e-6), 0, 1)
+    xyz = xyz @ eigenvectors[:, ::-1]
+    if len(xyz) > max_points:
+        indices = np.linspace(0, len(xyz) - 1, max_points, dtype=np.int64)
+        xyz, rgb = xyz[indices], rgb[indices]
 
-    width, height = size
-    margin = 44
-    px = (margin + x * (width - 2 * margin)).astype(np.int32)
-    py = (height - margin - y * (height - 2 * margin)).astype(np.int32)
-    order = np.argsort(depth)
-
-    canvas = Image.new("RGB", size, "#061821")
-    points = Image.new("RGBA", size, (0, 0, 0, 0))
-    draw = ImageDraw.Draw(points, "RGBA")
-    for index in order:
-        color = tuple(int(channel) for channel in rgb[index])
-        draw.ellipse((px[index] - 1, py[index] - 1, px[index] + 1, py[index] + 1), fill=(*color, 210))
-    glow = points.filter(ImageFilter.GaussianBlur(1.2))
-    canvas = Image.alpha_composite(canvas.convert("RGBA"), glow)
-    canvas = Image.alpha_composite(canvas, points).convert("RGB")
-    canvas = ImageEnhance.Contrast(canvas).enhance(1.08)
+    scale = np.quantile(np.linalg.norm(xyz, axis=1), 0.98)
+    xyz = np.clip(xyz / max(scale, 1e-6), -1.4, 1.4)
+    packed = np.column_stack((xyz, rgb / 255.0)).astype("<f4")
     target.parent.mkdir(parents=True, exist_ok=True)
-    canvas.save(target, "WEBP", quality=88, method=6)
+    packed.tofile(target)
 
 
 def main() -> None:
@@ -159,8 +125,6 @@ def main() -> None:
 
     images_dir = args.site_root / "static" / "images"
     figures_dir = images_dir / "figures"
-    scenes_dir = images_dir / "scenes"
-    clouds_dir = images_dir / "clouds"
     work_dir = args.site_root.parent / "tmp" / "site-assets"
     work_dir.mkdir(parents=True, exist_ok=True)
 
@@ -176,25 +140,12 @@ def main() -> None:
         qualitative,
         dpi=300,
     )
-    crop_qualitative_panels(qualitative, images_dir / "spume-results")
+    crop_observation_spume_pairs(qualitative, images_dir / "comparisons")
 
-    for label, (scene, frame_numbers) in SCENES.items():
-        source_dir = args.water3d_root / scene / "output" / "images"
-        for position, frame_number in enumerate(frame_numbers, start=1):
-            source = source_dir / f"image_{frame_number:04d}.jpg"
-            fit_webp(source, scenes_dir / label / f"frame-{position}.webp", (1280, 720))
-
-    fit_webp(
-        args.water3d_root / "cv_1426" / "output" / "images" / "image_0001.jpg",
-        images_dir / "hero.webp",
-        (1920, 1080),
-        quality=90,
-    )
-
-    for label, scene in (("reef-lab", "cv_1426"), ("green-water-rock", "cv_1173"), ("shallow-rock", "cv_1136")):
-        render_point_cloud(
+    for label, scene in POINT_CLOUDS.items():
+        export_point_cloud(
             args.water3d_root / scene / "output" / "fused.ply",
-            clouds_dir / f"{label}.webp",
+            args.site_root / "static" / "point-clouds" / f"{label}.spc",
         )
 
 if __name__ == "__main__":
