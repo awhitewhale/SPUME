@@ -1,24 +1,29 @@
 # SPUME
 
-Official implementation of **SPUME: Geometry-Addressed Risk Conditioning for
+Official implementation of **SPUME: Surface-Persistence Modeling for
 Transient-Resistant Underwater Multi-View Reconstruction**.
 
+[[Project page](https://awhitewhale.github.io/SPUME/)]
+
 SPUME uses provisional cameras and geometry from a frozen feed-forward backbone
-to compare point, depth, feature, normal, and temporal evidence at common 3D
-locations. The resulting surface-write risk conditions an identity-initialized,
-bounded residual depth adapter.
+to compare point, depth, feature, normal, and multi-view support evidence at
+predicted surface anchors. Robust window-wise normalization and weighted fusion
+produce a Surface-Support Deficit Field (SSDF), which conditions an
+identity-initialized, bounded log-depth refiner.
 
 ## Repository layout
 
 ```text
 configs/       experiment configurations
 datasets/      FLSea RGB/depth pairing and deterministic windows
-diagnostics/   geometry-addressed evidence and risk construction
-models/        surface-write controller and bounded depth adapter
+diagnostics/   cross-view evidence and SSDF construction
+models/        SSDF-conditioned bounded depth adapter
 scripts/       frozen-backbone cache construction
 training/      experiment-specific training programs
 evaluation/    result summarization
 tests/         unit tests
+docs/          static project page and web-ready assets
+tools/         project-page asset preparation
 train.py       cache-based adapter training entry point
 test.py        checkpoint evaluation entry point
 ```
@@ -84,7 +89,7 @@ adapter optimization from the expensive frozen-backbone forward pass.
 
 ## Training
 
-Train the risk-conditioned depth adapter on cache files whose names begin with
+Train the SSDF-conditioned depth adapter on cache files whose names begin with
 `train_`:
 
 ```bash
@@ -131,13 +136,3 @@ RMSE, delta-1 accuracy, and valid coverage.
 - Invalid, non-finite, and out-of-range depths are excluded consistently.
 - Generated caches, checkpoints, and output directories are ignored by Git.
 - Dataset licenses and access conditions remain those of the original providers.
-
-## Citation
-
-```bibtex
-@article{liu2026spume,
-  title   = {SPUME: Geometry-Addressed Risk Conditioning for Transient-Resistant Underwater Multi-View Reconstruction},
-  author  = {Liu, Yifan and Xing, Mingke and Peng, Bin and Hua, Tong and Zhao, Guo and Chen, Jincai},
-  year    = {2026}
-}
-```

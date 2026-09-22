@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="SPUME: Surface-Persistence Modeling for Transient-Resistant Underwater Multi-View Reconstruction.">
+  <meta name="keywords" content="SPUME, underwater 3D reconstruction, multi-view geometry, surface persistence, SSDF">
+  <meta name="theme-color" content="#061821">
+  <title>SPUME | Transient-Resistant Underwater Multi-View Reconstruction</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='15' fill='%23061821'/%3E%3Cpath d='M8 38c8-8 14 8 23 0s15 8 25 0' fill='none' stroke='%2367e8d1' stroke-width='6' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='22' r='8' fill='%23ff9568'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/site.css">
+  <script src="./static/js/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" data-header>
+    <a class="brand" href="#top" aria-label="SPUME home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>SPUME</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+      <span class="sr-only">Toggle navigation</span>
+      <span></span><span></span>
+    </button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-nav>
+      <a href="#overview">Overview</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#scenes">Scenes</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-media" aria-hidden="true">
+        <img src="./static/images/hero.webp" alt="" fetchpriority="high">
+        <div class="hero-wash"></div>
+        <div class="surface-grid"></div>
+      </div>
+      <div class="hero-content page-shell">
+        <div class="hero-copy reveal">
+          <p class="eyebrow"><span></span> Surface persistence for underwater geometry</p>
+          <h1><strong>SPUME</strong><br>Surface-Persistence Modeling for Transient-Resistant Underwater Multi-View Reconstruction</h1>
+          <p class="hero-summary">SPUME evaluates whether provisional 3D surfaces remain supported across views, then uses that evidence to refine depth without overwriting reliable backbone geometry.</p>
+          <div class="authors" aria-label="Authors">
+            <a href="https://awhitewhale.github.io/liuyifan/">Yifan Liu</a>
+            <span>Tong Hua</span>
+            <span>Guo Zhao<sup>*</sup></span>
+            <span>Jincai Chen</span>
+          </div>
+          <p class="affiliations">Hubei University of Technology &nbsp;·&nbsp; Wuhan National Laboratory for Optoelectronics, HUST</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://github.com/awhitewhale/SPUME">View code <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+
+        <aside class="hero-card reveal" aria-label="SPUME pipeline summary">
+          <div class="hero-card-image">
+            <img src="./static/images/scenes/reef-lab/frame-1.webp" alt="A Water3D underwater reef scene with transient fish and scattering">
+            <span class="scan-line" aria-hidden="true"></span>
+            <span class="anchor anchor-a" aria-hidden="true"></span>
+            <span class="anchor anchor-b" aria-hidden="true"></span>
+            <span class="anchor anchor-c" aria-hidden="true"></span>
+          </div>
+          <div class="hero-card-caption">
+            <span class="signal-dot"></span>
+            <p><strong>Surface anchors</strong><br>Common 3D locations organize evidence across views.</p>
+            <span class="frame-code">t − 1 · t · t + 1</span>
+          </div>
+        </aside>
+      </div>
+      <a class="scroll-cue" href="#overview"><span>Explore SPUME</span><i aria-hidden="true"></i></a>
+    </section>
+
+    <section class="section section-intro" id="overview">
+      <div class="page-shell">
+        <div class="section-heading reveal">
+          <p class="eyebrow"><span></span> The problem</p>
+          <h2>Transient evidence should not become persistent structure.</h2>
+          <p>Particles, caustics, scattering changes, and temporary occlusions can be consolidated into incorrect 3D geometry. SPUME makes local surface support explicit before applying a correction.</p>
+        </div>
+
+        <div class="principles">
+          <article class="principle reveal">
+            <span class="principle-number">01</span>
+            <div class="principle-icon anchor-icon" aria-hidden="true"><i></i></div>
+            <h3>Address the surface</h3>
+            <p>Treat every backbone-predicted 3D point as a surface anchor and reproject it into neighboring views.</p>
+          </article>
+          <article class="principle reveal">
+            <span class="principle-number">02</span>
+            <div class="principle-icon field-icon" aria-hidden="true"><i></i><i></i><i></i></div>
+            <h3>Measure support</h3>
+            <p>Robustly normalize and fuse point, depth, feature, normal, and multi-view support cues into SSDF.</p>
+          </article>
+          <article class="principle reveal">
+            <span class="principle-number">03</span>
+            <div class="principle-icon refine-icon" aria-hidden="true"><i></i></div>
+            <h3>Refine within bounds</h3>
+            <p>Condition a zero-initialized log-depth refiner while cameras, rays, and the feed-forward backbone remain fixed.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section method-section" id="method">
+      <div class="page-shell">
+        <div class="section-heading section-heading-light reveal">
+          <p class="eyebrow"><span></span> Method</p>
+          <h2>Cross-view support, organized around predicted surfaces.</h2>
+          <p>The pipeline follows a single path from frozen backbone geometry to a Surface-Support Deficit Field and bounded depth correction.</p>
+        </div>
+        <button class="figure-frame reveal" type="button" data-lightbox="./static/images/figures/fig1.webp" aria-label="Open the full SPUME pipeline figure">
+          <img src="./static/images/figures/fig1.webp" alt="SPUME pipeline: surface anchors, cross-view consistency, SSDF construction, and bounded depth refinement" loading="lazy">
+          <span>Open full figure <b aria-hidden="true">↗</b></span>
+        </button>
+        <div class="method-detail-grid">
+          <div class="method-detail-copy reveal">
+            <p class="section-kicker">Surface-Support Deficit Field</p>
+            <h3>Five cues, one spatial field.</h3>
+            <p>Each cue responds to a different failure mode. Median/MAD normalization places them on a comparable window-relative scale, while weighted fusion highlights predicted surfaces with unusually weak cross-view support.</p>
+            <ul class="cue-list">
+              <li><span>01</span> 3D point consistency</li>
+              <li><span>02</span> Depth consistency</li>
+              <li><span>03</span> Feature consistency</li>
+              <li><span>04</span> Normal consistency</li>
+              <li><span>05</span> Multi-view support</li>
+            </ul>
+          </div>
+          <button class="detail-figure reveal" type="button" data-lightbox="./static/images/figures/fig2.webp" aria-label="Open the detailed SSDF figure">
+            <img src="./static/images/figures/fig2.webp" alt="Detailed SSDF construction from geometry-aligned multi-cue evidence" loading="lazy">
+            <span class="zoom-label">SSDF detail <b aria-hidden="true">+</b></span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="section results-section" id="results">
+      <div class="page-shell">
+        <div class="section-heading reveal">
+          <p class="eyebrow"><span></span> Results</p>
+          <h2>Stable geometry under transient conditions.</h2>
+          <p>Final-manuscript results show consistent gains in depth, point-cloud fidelity, temporal stability, sequence transfer, and zero-shot backbone transfer.</p>
+        </div>
+
+        <div class="metrics" aria-label="SPUME headline results">
+          <article class="metric reveal"><span>Scale-aligned AbsRel</span><strong>0.0594</strong><small>192 held-out four-frame windows</small></article>
+          <article class="metric reveal"><span>RMSE</span><strong>0.291</strong><small>Window-held-out evaluation</small></article>
+          <article class="metric reveal"><span>Chamfer distance</span><strong>−0.0032</strong><small>Under transient conditions</small></article>
+          <article class="metric reveal"><span>Temporal jitter</span><strong>−0.0015</strong><small>Under transient conditions</small></article>
+          <article class="metric reveal"><span>Point accuracy</span><strong>+0.0077</strong><small>Under transient conditions</small></article>
+          <article class="metric reveal"><span>Zero-shot VGGT AbsRel</span><strong>−0.0035</strong><small>No SPUME fine-tuning</small></article>
+        </div>
+
+        <div class="result-showcase">
+          <div class="result-copy reveal">
+            <p class="section-kicker">SPUME reconstructions</p>
+            <h3>Transient-aware surface refinement.</h3>
+            <p>SPUME suppresses displaced surface samples while retaining persistent scene structure. The panels below are the SPUME-only reconstruction outputs from the final manuscript.</p>
+          </div>
+          <div class="result-panels">
+            <figure class="result-panel reveal">
+              <img src="./static/images/spume-results/particles.webp" alt="SPUME reconstruction in a particle-heavy underwater scene" loading="lazy">
+              <figcaption><span>01</span> Particles</figcaption>
+            </figure>
+            <figure class="result-panel reveal">
+              <img src="./static/images/spume-results/caustics.webp" alt="SPUME reconstruction under underwater caustics" loading="lazy">
+              <figcaption><span>02</span> Caustics</figcaption>
+            </figure>
+            <figure class="result-panel reveal">
+              <img src="./static/images/spume-results/temporary-occlusion.webp" alt="SPUME reconstruction with temporary occlusion" loading="lazy">
+              <figcaption><span>03</span> Temporary occlusion</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section scenes-section" id="scenes">
+      <div class="page-shell">
+        <div class="section-heading section-heading-light reveal">
+          <p class="eyebrow"><span></span> Water3D scenes</p>
+          <h2>Real underwater sequences across visibility and structure.</h2>
+          <p>Representative observations are drawn directly from the Water3D output directories used for the site showcase.</p>
+        </div>
+
+        <div class="scene-tabs reveal" role="tablist" aria-label="Water3D scenes">
+          <button class="is-active" role="tab" aria-selected="true" data-scene="reef-lab">Reef lab</button>
+          <button role="tab" aria-selected="false" data-scene="fish-reef">Fish reef</button>
+          <button role="tab" aria-selected="false" data-scene="rock-garden">Rock garden</button>
+          <button role="tab" aria-selected="false" data-scene="submerged-structure">Structure</button>
+          <button role="tab" aria-selected="false" data-scene="green-water-rock">Green water</button>
+          <button role="tab" aria-selected="false" data-scene="shallow-rock">Shallow rock</button>
+        </div>
+
+        <div class="scene-viewer reveal" data-scene-viewer>
+          <div class="scene-image-wrap">
+            <img data-scene-image src="./static/images/scenes/reef-lab/frame-1.webp" alt="Reef lab, frame 1" loading="lazy">
+            <span class="scene-index" data-scene-index>01 / 03</span>
+          </div>
+          <div class="scene-controls">
+            <div>
+              <p data-scene-title>Reef laboratory</p>
+              <span data-scene-description>Complex coral structure with moving fish, illumination variation, and open-water scattering.</span>
+            </div>
+            <div class="scene-actions">
+              <button type="button" data-scene-prev aria-label="Previous frame">←</button>
+              <button type="button" data-scene-next aria-label="Next frame">→</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cloud-strip reveal">
+          <div class="cloud-copy">
+            <p class="section-kicker">Evaluation geometry</p>
+            <h3>Dense scene context from Water3D outputs.</h3>
+            <p>Web-ready previews are rendered from the original fused point clouds; the full-resolution outputs remain outside the repository.</p>
+            <div class="cloud-tabs" role="tablist" aria-label="Point-cloud scenes">
+              <button class="is-active" role="tab" aria-selected="true" data-cloud="reef-lab">Reef lab</button>
+              <button role="tab" aria-selected="false" data-cloud="green-water-rock">Green water</button>
+              <button role="tab" aria-selected="false" data-cloud="shallow-rock">Shallow rock</button>
+            </div>
+          </div>
+          <img data-cloud-image src="./static/images/clouds/reef-lab.webp" alt="Dense Water3D point-cloud preview of the reef laboratory scene" loading="lazy">
+        </div>
+      </div>
+    </section>
+
+    <section class="section abstract-section" id="abstract">
+      <div class="page-shell abstract-grid">
+        <div class="section-heading reveal">
+          <p class="eyebrow"><span></span> Abstract</p>
+          <h2>Surface support as guidance for transient-resistant reconstruction.</h2>
+        </div>
+        <div class="abstract-copy reveal">
+          <p>Feed-forward underwater multi-view reconstruction can encode particles, caustics, scattering changes, and temporary occlusions as persistent 3D structure. This transient geometry imprinting exposes three problems: image-space signals do not directly reveal whether a predicted 3D surface is supported across views; point, depth, feature, normal, and temporal cues have incompatible scales; and detecting weak support does not specify how geometry should be corrected without damaging reliable predictions.</p>
+          <p>We propose SPUME (Surface-Persistence-guided Underwater Multi-view Estimation) with three corresponding innovations. First, SPUME treats each backbone-predicted 3D point as a surface anchor and evaluates its cross-view consistency. Second, it robustly normalizes and fuses five complementary cues into a Surface-Support Deficit Field (SSDF). Third, SSDF conditions a bounded log-depth refiner while the backbone, camera estimates, and pixel rays remain fixed.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="page-shell">
+      <div><strong>SPUME</strong><span>Surface-Persistence Modeling for underwater multi-view reconstruction.</span></div>
+      <div class="footer-links"><a href="https://github.com/awhitewhale/SPUME">Code</a><a href="#top">Back to top ↑</a></div>
+    </div>
+  </footer>
+
+  <dialog class="lightbox" data-lightbox-dialog>
+    <button type="button" aria-label="Close figure" data-lightbox-close>×</button>
+    <img src="" alt="Expanded manuscript figure" data-lightbox-image>
+  </dialog>
+</body>
+</html>
